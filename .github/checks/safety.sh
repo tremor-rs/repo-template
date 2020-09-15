@@ -6,7 +6,7 @@ help() {
 Usage: ${0##*/} [-hd] [TEST]...
 code sanity checker
   -h         show this help
-  -a         run all chekcs
+  -a         run all checks
   -u         check for unwrap
   -i         check for unimplemented
   -r         check for unreachable
@@ -75,7 +75,7 @@ while getopts hauiprebldxc opt; do
                     count=$((count + 1))
                 fi
             done
-            ;;  
+            ;;
         d)
             for file in $files
             do
@@ -86,7 +86,7 @@ while getopts hauiprebldxc opt; do
                     count=$((count + 1))
                 fi
             done
-            ;;  
+            ;;
 
         x)
             for file in $files
@@ -98,11 +98,11 @@ while getopts hauiprebldxc opt; do
                     count=$((count + 1))
                 fi
             done
-            ;;                  
+            ;;
         p)
             for file in $files
             do
-                if sed -e '/mod test.*/,$d' "$file" | grep 'panic!(' > /dev/null
+                if sed -e '/mod test.*/,$d' -e '/ALLOW: /{N;d;}' "$file" | grep 'panic!(' > /dev/null
                 then
                     echo "##[error] panic found in $file no, just no!"
                     grep -nH 'panic!(' "$file"
@@ -139,14 +139,9 @@ while getopts hauiprebldxc opt; do
                     echo "##[error] $file does not enforce clippy::pedantic."
                     count=$((count + 1))
                 fi
-                if  ! grep 'clippy::result_unwrap_used' "$file" > /dev/null
+                if  ! grep 'clippy::unwrap_used' "$file" > /dev/null
                 then
-                    echo "##[error] $file does not enforce clippy::result_unwrap_used."
-                    count=$((count + 1))
-                fi
-                if  ! grep 'clippy::option_unwrap_used' "$file" > /dev/null
-                then
-                    echo "##[error] $file does not enforce clippy::option_unwrap_used."
+                    echo "##[error] $file does not enforce clippy::unwrap_used."
                     count=$((count + 1))
                 fi
                 if  ! grep 'clippy::unnecessary_unwrap' "$file" > /dev/null
